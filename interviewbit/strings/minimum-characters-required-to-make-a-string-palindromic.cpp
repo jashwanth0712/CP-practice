@@ -1,23 +1,29 @@
 //----------------------brute force-----------------------------------------
 bool check_pallindrome(string A){
-    int n= A.size()-1;
-    for( int i=0;i<=n;i++){
-        if(A[i]!=A[n-i])
-            return false;
+    string normal=A;
+    reverse(A.begin(), A.end());
+    if(normal==A){
+        // pallindome 
+        return true;
     }
-    return true;
+    else{
+        return false;
+    }
 }
-int Solution::solve(string A) {
-    int count=0;
-    int n=A.size();
-    while(n>0){
-        if(check_pallindrome(A.substr(0,n))){
+int Solution::solve(string a) {
+    int i=0;
+    int index=a.length()-1;
+    while(index>=0){
+        // cout<<endl<<a<<endl;
+        if(check_pallindrome(a)==1){
+            return i;
             break;
         }
         else{
-            count ++;
-            n--;
+            i++;
+            a.erase(index,1);
+            index--;
         }
     }
-    return count;
+    return i;
 }
