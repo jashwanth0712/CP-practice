@@ -1,16 +1,23 @@
-use std::io::{stdout, Write};
-
+use std::io::Read;
 use curl::easy::Easy;
 
-// Print a web page onto stdout
 fn main() {
-    let mut easy = Easy::new();
-    easy.url("https://www.rust-lang.org/").unwrap();
-    easy.write_function(|data| {
-        stdout().write_all(data).unwrap();
-        Ok(data.len())
-    }).unwrap();
-    easy.perform().unwrap();
+    let mut data = "this is the body".as_bytes();
 
-    println!("{}", easy.response_code().unwrap());
+    let mut easy = Easy::new();
+    easy.url("http://localhost:3000").unwrap();
+    easy.post(true).unwrap();
+    easy.post_field_size(data.len() as u64).unwrap();
+
+    let mut transfer = easy.transfer();
+    transfer.read_function(|buf| {
+        Ok(data.read(buf).unwrap_or(0))
+    }).unwrap();
+    let mut html_data = String::new();
+    transfer.write_function(|data| {
+        html_data = String::from_utf8(Vec::from(data)).unwrap();
+        Ok(data.len())
+        }).unwrap();
+    transfer.perform().unwrap();
+    println!("HTML body {:#?}", html_data);
 }
